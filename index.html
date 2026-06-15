@@ -16,6 +16,24 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .chart-container { position: relative; width: 100%; max-width: 800px; }
+
+        /* 🌿 클로드 풍의 눈이 편안한 웜톤 테마 지정 */
+        body { background-color: #fbfaf7 !important; color: #191919; }
+        .bg-white { background-color: #f7f5f0 !important; }
+        .bg-gray-100 { background-color: #fbfaf7 !important; }
+        .bg-gray-50 { background-color: #f3f0e8 !important; }
+        .border-gray-200, .border-gray-300 { border-color: #e6e2da !important; }
+        
+        /* 버튼 및 포인트 컬러: 클로드 특유의 차분한 카멜 브라운 & 챠콜 톤 */
+        .bg-blue-600, .bg-indigo-600 { background-color: #cc7a5c !important; } /* 포인트 브라운 */
+        .bg-blue-600:hover, .bg-indigo-600:hover { background-color: #b36449 !important; }
+        .bg-gray-600, .bg-gray-800 { background-color: #383735 !important; } /* 챠콜 브라운 */
+        .bg-gray-600:hover, .bg-gray-800:hover { background-color: #2c2b29 !important; }
+        .text-indigo-600 { color: #cc7a5c !important; }
+        .bg-indigo-50 { background-color: #f3f0e8 !important; }
+        .bg-indigo-100 { background-color: #e6e2da !important; text-color: #383735 !important; }
+
+        
         /* 텍스트 박스: 평상시에는 얇고 투명한 회색 실선으로 깔끔하게 처리 */
         .text-box {
             position: absolute; background: rgba(255, 255, 255, 0.85);
