@@ -16,13 +16,19 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .chart-container { position: relative; width: 100%; max-width: 800px; }
+        /* 텍스트 박스: 평상시에는 얇고 투명한 회색 실선으로 깔끔하게 처리 */
         .text-box {
             position: absolute; background: rgba(255, 255, 255, 0.85);
-            border: 2px dashed #4b5563; font-size: 8.5pt; overflow: hidden;
+            border: 1px solid #d1d5db; font-size: 8.5pt; overflow: hidden;
             cursor: move; min-width: 60px; min-height: 35px; z-index: 10;
             box-sizing: border-box; padding: 4px;
+            transition: border-color 0.15s, border-width 0.15s;
         }
-        .text-box.resize-edge { cursor: se-resize; border-style: solid; border-color: #3b82f6; }
+        /* 테두리 정렬(선택/크기 조절) 시에는 지금처럼 직관적인 파란색 두꺼운 선으로 변경 */
+        .text-box.resize-edge { 
+            cursor: se-resize; 
+            border: 2px solid #3b82f6; 
+        }
         [x-cloak] { display: none !important; }
     </style>
 </head>
