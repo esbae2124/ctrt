@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>현실치료 사례개념화 노트</title>
-    <!-- Alpine.js (상태관리) & Tailwind CSS (디자인) -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -18,7 +17,6 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
 
-    <!-- 0. 관리자 로그인 모달 -->
     <div x-show="!isLoggedIn" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-xl w-96">
             <h2 class="text-xl font-bold mb-4 text-center text-gray-800">현실치료 노트 인증</h2>
@@ -27,7 +25,6 @@
         </div>
     </div>
 
-    <!-- 메인 대시보드 (로그인 성공 시 표시) -->
     <div x-show="isLoggedIn" class="max-w-7xl mx-auto" x-cloak>
         <header class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b gap-4">
             <h1 class="text-2xl font-bold text-gray-800">🌿 현실치료 사례개념화 시스템</h1>
@@ -37,7 +34,6 @@
             </div>
         </header>
 
-        <!-- 4. 사례/상황 목록 화면 -->
         <div x-show="showList" class="bg-white p-6 rounded-lg shadow mb-6 overflow-x-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-700">사례 및 상황 목록</h3>
@@ -72,9 +68,7 @@
             </table>
         </div>
 
-        <!-- 메인 워크스페이스 (사례 편집창) -->
         <div x-show="currentCase" class="bg-white p-6 rounded-lg shadow-lg">
-            <!-- 상단 타이틀바 -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b">
                 <div class="flex flex-wrap items-center gap-3">
                     <input type="text" x-model="currentCase.client_name" class="text-2xl font-bold border-b-2 border-gray-300 focus:border-indigo-500 focus:outline-none pb-1" placeholder="내담자 이름(사례명)">
@@ -86,7 +80,6 @@
                 </button>
             </div>
 
-            <!-- 내담자 설명 / 심리검사 / 파일 링크 프로필 섹션 -->
             <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
                     👤 내담자 기본 프로필 및 임상 정보 (사례 공통)
@@ -94,39 +87,57 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">인상착의 및 행동 관찰</label>
-                        <textarea x-model="currentCase.client_info.description" class="w-full p-2 border rounded-md text-sm h-20 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="예: 30대 중반, 축 처진 어깨, 작은 목소리로 대답함. 눈맞춤을 피함."></textarea>
+                        <textarea x-model="currentCase.client_info.description" class="w-full p-2 border rounded-md text-sm h-24 focus:ring-1 focus:ring-indigo-500 outline-none resize-none" placeholder="예: 30대 중반, 축 처진 어깨, 작은 목소리로 대답함. 눈맞춤을 피함."></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-500 mb-1">심리검사 결과 요약 (MMPI, TCI, SCT 등)</label>
-                        <textarea x-model="currentCase.client_info.test_results" class="w-full p-2 border rounded-md text-sm h-20 focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="예: MMPI-2 2-7 코드 상승(우울/불안). SCT에서 권위자에 대한 적대감 관찰됨."></textarea>
+                        <textarea x-model="currentCase.client_info.test_results" class="w-full p-2 border rounded-md text-sm h-24 focus:ring-1 focus:ring-indigo-500 outline-none resize-none" placeholder="예: MMPI-2 2-7 코드 상승(우울/불안). SCT에서 권위자에 대한 적대감 관찰됨."></textarea>
                     </div>
                 </div>
-                <div class="mt-3">
-                    <label class="block text-xs font-semibold text-gray-500 mb-1">참부 파일 링크 (구글 드라이브 검사지 스캔본 등)</label>
-                    <div class="flex gap-2">
-                        <input type="text" x-model="currentCase.client_info.file_url" class="flex-1 p-2 border rounded-md text-sm focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="https://drive.google.com/file/d/... 공유 링크 주소 입력">
-                        <template x-if="currentCase.client_info.file_url">
-                            <a :href="currentCase.client_info.file_url" target="_blank" class="bg-gray-700 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-800 transition flex items-center">🔗 열기</a>
+                
+                <div class="mt-4">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-xs font-semibold text-gray-500">임상 자료 및 심리검사지 파일 링크 (구글 드라이브 등)</label>
+                        <button @click="addFileLink" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-2 py-1 rounded border border-indigo-200 transition">
+                            ➕ 파일 링크 추가
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-2 max-h-40 overflow-y-auto pr-1">
+                        <template x-for="(linkItem, index) in currentCase.client_info.file_links" :key="index">
+                            <div class="flex gap-2 items-center bg-white p-1.5 rounded-md border shadow-sm">
+                                <input type="text" x-model="linkItem.name" class="w-1/4 p-1.5 border rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="자료 설명 (예: MMPI 결과지)">
+                                <input type="text" x-model="linkItem.url" class="flex-1 p-1.5 border rounded text-xs focus:ring-1 focus:ring-indigo-500 outline-none" placeholder="구글 드라이브 링크 붙여넣기">
+                                
+                                <template x-if="linkItem.url">
+                                    <a :href="linkItem.url" target="_blank" class="bg-gray-700 text-white p-1.5 rounded text-xs font-medium hover:bg-gray-800 transition">
+                                        🔗 열기
+                                    </a>
+                                </template>
+                                <button @click="removeFileLink(index)" class="bg-red-50 text-red-600 hover:bg-red-100 border border-red-200 p-1.5 rounded text-xs transition">
+                                    🗑️ 삭제
+                                </button>
+                            </div>
+                        </template>
+                        <template x-if="!currentCase.client_info.file_links || currentCase.client_info.file_links.length === 0">
+                            <p class="text-xs text-gray-400 italic text-center py-2 bg-white rounded border border-dashed">등록된 첨부 파일 링크가 없습니다.오른쪽 상단 버튼으로 추가하세요.</p>
                         </template>
                     </div>
                 </div>
             </div>
 
-            <!-- 하단 2분할 작업대: 좌측 블루차트 / 우측 테이블 -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
-                <!-- 좌측: 블루차트 드래그컴포넌트 -->
                 <div>
                     <div class="flex justify-between items-center mb-2">
                         <span class="font-bold text-gray-700 flex items-center">📊 블루차트 (Total Behavior)</span>
                         <button @click="addTextBox" class="bg-yellow-500 text-white text-xs px-3 py-1.5 rounded-md shadow hover:bg-yellow-600">+ 텍스트 박스 추가</button>
                     </div>
                     <div class="chart-container border rounded-lg bg-gray-50 p-1 overflow-hidden shadow-inner" id="chartArea">
-                        <!-- ✨ 입력해주신 구글 드라이브 블루차트 직접 다운로드 주소로 업데이트 완료! -->
-                        <img src="https://docs.google.com/uc?export=download&id=1SHB471ly5ECZw8SAU2oFyqfsFfZyZ6r0" alt="Blue Chart" class="w-full opacity-95 select-none">
-                        
-                        <!-- 동적 텍스트 박스 배치 -->
-                        <template x-for="box in currentCase.boxes" :key="box.id">
+    
+    <img src="https://docs.google.com/uc?export=download&id=1SHB471ly5ECZw8SAU2oFyqfsFfZyZ6r0" alt="Blue Chart" class="w-full opacity-95 select-none">
+    
+    <template x-for="box in currentCase.boxes" :key="box.id">
                             <div class="text-box rounded shadow-md p-1.5"
                                  :style="`left: ${box.x}px; top: ${box.y}px; width: ${box.w}px; height: ${box.h}px;`"
                                  @mousedown="dragStart($event, box)"
@@ -137,7 +148,6 @@
                     </div>
                 </div>
 
-                <!-- 우측: R-R-W-D-E-P 가독성 맞춤 표 -->
                 <div>
                     <span class="font-bold text-gray-700 block mb-2">📋 R-R-W-D-E-P 상담 과정 기록</span>
                     <div class="border rounded-lg overflow-hidden shadow-sm bg-white divide-y">
@@ -158,7 +168,6 @@
         </div>
     </div>
 
-    <!-- 팝업 입력 모달 창 (공통) -->
     <div x-show="modal.show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg mx-4">
             <h3 class="text-lg font-bold mb-3 text-gray-800" x-text="modal.title"></h3>
@@ -210,7 +219,19 @@
                             method: 'POST',
                             body: JSON.stringify({ action: 'fetch' })
                         });
-                        this.caseList = await response.json();
+                        let data = await response.json();
+                        // 로드한 각 사례의 하위 호환성 보장 처리
+                        this.caseList = data.map(item => {
+                            if (!item.client_info) {
+                                item.client_info = { description: '', test_results: '', file_links: [] };
+                            } else if (typeof item.client_info.file_url !== 'undefined' && !item.client_info.file_links) {
+                                // 기존의 단일 링크(file_url) 정보가 시트에 있었다면 리스트 형태로 자동 변환해 줌
+                                item.client_info.file_links = item.client_info.file_url ? [{ name: '기본 파일', url: item.client_info.file_url }] : [];
+                                delete item.client_info.file_url;
+                            }
+                            if(!item.client_info.file_links) item.client_info.file_links = [];
+                            return item;
+                        });
                     } catch (e) { console.error("데이터 로드 실패:", e); }
                 },
                 createNewCase() {
@@ -218,7 +239,7 @@
                         id: Date.now(), client_name: '', situation_name: '',
                         created_at: new Date().toLocaleDateString(), updated_at: new Date().toLocaleDateString(),
                         table: { R1:'', R2:'', W:'', D:'', E:'', P:'' }, boxes: [],
-                        client_info: { description: '', test_results: '', file_url: '' }
+                        client_info: { description: '', test_results: '', file_links: [] }
                     };
                     this.showList = false;
                 },
@@ -237,6 +258,15 @@
                 selectCase(item) {
                     this.currentCase = JSON.parse(JSON.stringify(item));
                     this.showList = false;
+                },
+                addFileLink() {
+                    if(!this.currentCase.client_info.file_links) {
+                        this.currentCase.client_info.file_links = [];
+                    }
+                    this.currentCase.client_info.file_links.push({ name: '', url: '' });
+                },
+                removeFileLink(index) {
+                    this.currentCase.client_info.file_links.splice(index, 1);
                 },
                 addTextBox() {
                     if(!this.currentCase) return;
