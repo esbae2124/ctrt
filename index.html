@@ -60,29 +60,47 @@
         }
         [x-cloak] { display: none !important; }
 
-        /* 🖨️ 인쇄(프린트)할 때만 작동하는 마법의 코드 */
+        /* 🖨️ 인쇄(프린트)할 때만 작동하는 마법의 코드 (폰트 축소 버전) */
         @media print {
-            /* 1. 배경색을 강제로 완전한 흰색 바탕, 검은 글씨로 고정 */
+            /* 1. 배경색을 강제로 완전한 흰색 바탕, 검은 글씨로 고정 및 폰트 크기 8.5pt 제한 */
             body, .bg-white, .bg-gray-100, .bg-gray-50, .bg-indigo-50 {
                 background-color: #ffffff !important;
                 background: #ffffff !important;
                 color: #000000 !important;
+                font-size: 8.5pt !important;
             }
-            /* 2. 인쇄할 때 굳이 종이에 나올 필요 없는 상단 버튼, 동기화 버튼, 모달 창 등을 숨김 */
-            header, button, .bg-indigo-55, a, [x-show="!isLoggedIn"] {
+            
+            /* 2. 테이블 내부 및 프로필 서식 안의 텍스트 영역도 8.5pt로 강제 축소 */
+            td, th, textarea, div, span, p {
+                font-size: 8.5pt !important;
+                line-height: 1.4 !important;
+            }
+            
+            /* 3. 블루차트 위 텍스트 박스 글자 크기도 싱크 맞춤 */
+            .text-box {
+                font-size: 8.5pt !important;
+                border: 1px solid #000000 !important;
+                background: rgba(255, 255, 255, 0.9) !important;
+            }
+
+            /* 4. 인쇄 시 제외할 불필요한 UI 요소들 숨김 */
+            header, button, .bg-indigo-55, a, [x-show="!isLoggedIn"], .text-xs.text-gray-400 {
                 display: none !important;
             }
-            /* 3. 내담자 프로필 섹션의 테두리를 인쇄에 최적화된 얇은 선으로 변경 */
+            
+            /* 5. 프로필 섹션을 인쇄용 얇은 검은 테두리로 변경 */
             .mb-6.p-4.bg-gray-50 {
                 background-color: #ffffff !important;
                 border: 1px solid #000000 !important;
                 padding: 10px !important;
+                border-radius: 4px !important;
             }
-            /* 4. 화면 크기에 구애받지 않고 종이 가로폭에 꽉 차게 인쇄 */
-            .max-w-7xl { max-width: 100% !important; width: 100% !important; p: 0 !important; }
-            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+            
+            /* 6. 종이 가로폭에 맞춰 레이아웃 좌우 2분할 고정 */
+            .max-w-7xl { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 15px !important; }
         }
-
+        
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
