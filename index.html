@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>현실치료 사례개념화 노트</title>
+    <!-- Alpine.js (상태관리) & Tailwind CSS (디자인) -->
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
@@ -17,6 +18,7 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
 
+    <!-- 0. 관리자 로그인 모달 -->
     <div x-show="!isLoggedIn" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
         <div class="bg-white p-8 rounded-lg shadow-xl w-96">
             <h2 class="text-xl font-bold mb-4 text-center text-gray-800">현실치료 노트 인증</h2>
@@ -25,6 +27,7 @@
         </div>
     </div>
 
+    <!-- 메인 대시보드 (로그인 성공 시 표시) -->
     <div x-show="isLoggedIn" class="max-w-7xl mx-auto" x-cloak>
         <header class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b gap-4">
             <h1 class="text-2xl font-bold text-gray-800">🌿 현실치료 사례개념화 시스템</h1>
@@ -34,6 +37,7 @@
             </div>
         </header>
 
+        <!-- 4. 사례/상황 목록 화면 -->
         <div x-show="showList" class="bg-white p-6 rounded-lg shadow mb-6 overflow-x-auto">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-lg font-bold text-gray-700">사례 및 상황 목록</h3>
@@ -68,7 +72,9 @@
             </table>
         </div>
 
+        <!-- 메인 워크스페이스 (사례 편집창) -->
         <div x-show="currentCase" class="bg-white p-6 rounded-lg shadow-lg">
+            <!-- 상단 타이틀바 -->
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-4 border-b">
                 <div class="flex flex-wrap items-center gap-3">
                     <input type="text" x-model="currentCase.client_name" class="text-2xl font-bold border-b-2 border-gray-300 focus:border-indigo-500 focus:outline-none pb-1" placeholder="내담자 이름(사례명)">
@@ -80,6 +86,7 @@
                 </button>
             </div>
 
+            <!-- 내담자 설명 / 심리검사 / 파일 링크 프로필 섹션 -->
             <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
                 <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center">
                     👤 내담자 기본 프로필 및 임상 정보 (사례 공통)
@@ -104,7 +111,8 @@
                     </div>
                 </div>
             </div>
-   <!-- 하단 2분할 작업대: 좌측 블루차트 / 우측 테이블 -->
+
+            <!-- 하단 2분할 작업대: 좌측 블루차트 / 우측 테이블 -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
                 <!-- 좌측: 블루차트 드래그컴포넌트 -->
@@ -150,6 +158,7 @@
         </div>
     </div>
 
+    <!-- 팝업 입력 모달 창 (공통) -->
     <div x-show="modal.show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" x-cloak>
         <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg mx-4">
             <h3 class="text-lg font-bold mb-3 text-gray-800" x-text="modal.title"></h3>
@@ -167,7 +176,7 @@
     </div>
 
     <script>
-        // ⚠️ 여기에 구글 배포 성공 후 생성된 웹 앱 URL 주소를 붙여넣으세요!
+        // ⚠️ 여기에 구글 웹 앱 새 배포 성공 후 생성된 최종 URL 주소를 붙여넣으세요!
         const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFCssMTQ9A0LsTlB--GsCdZdyg_18LGiMrQlGuiW_FfL0fzXFVTfD2479Wzgptu7kO6w/exec"; 
 
         function app() {
@@ -177,7 +186,6 @@
                 modal: { show: false, type: '', targetId: '', title: '', value: '' },
                 
                 initApp() {
-                    // 단축키 설정
                     window.addEventListener('keydown', (e) => {
                         if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                             if(this.modal.show) { this.saveModalValue(); }
@@ -186,7 +194,7 @@
                     });
                 },
                 login() {
-                    if(this.password === "1234") { // ⚠️ 실 운영용 비밀번호 변경 권장
+                    if(this.password === "1234") { 
                         this.isLoggedIn = true;
                         this.loadDataFromSheets();
                     } else { alert("비밀번호가 올바르지 않습니다."); }
@@ -222,7 +230,6 @@
                         created_at: new Date().toLocaleDateString(),
                         updated_at: new Date().toLocaleDateString(),
                         table: { R1:'', R2:'', W:'', D:'', E:'', P:'' }, boxes: [],
-                        // 같은 내담자이므로 기존 프로필 정보를 그대로 복사해옵니다.
                         client_info: JSON.parse(JSON.stringify(parentCase.client_info))
                     };
                     this.showList = false;
@@ -272,7 +279,6 @@
                     if(!this.currentCase.client_name.trim()) return alert("사례명을 입력해 주세요.");
                     this.currentCase.updated_at = new Date().toLocaleDateString();
                     
-                    // 우선 로컬 리스트에 즉시 반영
                     let idx = this.caseList.findIndex(c => c.id === this.currentCase.id);
                     if(idx >= 0) this.caseList[idx] = JSON.parse(JSON.stringify(this.currentCase));
                     else this.caseList.push(JSON.parse(JSON.stringify(this.currentCase)));
