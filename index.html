@@ -3,12 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
+
     <!-- 📍 여기에 복사한 og 코드를 그대로 붙여넣으세요! -->
     <meta property="og:type" content="website">
     <meta property="og:title" content="현실치료 사례개념화 노트">
     <meta property="og:description" content="글라서(William Glasser) 모델 기반 블루차트 및 R-R-W-D-E-P 상담 기록 시스템">
-    <meta property="og:image" content="https://docs.google.com/uc?export=download&id=1SHB471ly5ECZw8SAU2oFyqfsFfZyZ6r0">
+    
+    <meta property="og:image" content="blue-chart.jpg">
+    
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     
@@ -144,8 +146,9 @@
                     </div>
                     <div class="chart-container border rounded-lg bg-gray-50 p-1 overflow-hidden shadow-inner" id="chartArea">
     
-    <img src="https://docs.google.com/uc?export=download&id=1SHB471ly5ECZw8SAU2oFyqfsFfZyZ6r0" alt="Blue Chart" class="w-full opacity-95 select-none">
+    <img src="bluechart.jpg" alt="Blue Chart" alt="Blue Chart" class="w-full opacity-95 select-none">
     
+    <!-- 동적 텍스트 박스 배치 -->
     <template x-for="box in currentCase.boxes" :key="box.id">
                             <div class="text-box rounded shadow-md p-1.5"
                                  :style="`left: ${box.x}px; top: ${box.y}px; width: ${box.w}px; height: ${box.h}px;`"
