@@ -24,37 +24,40 @@
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     
     <style>
-        /* 🌿 클로드 풍의 눈이 편안한 웜톤 테마 지정 */
-        body { background-color: #fbfaf7 !important; color: #191919; }
-        .bg-white { background-color: #f7f5f0 !important; }
-        .bg-gray-100 { background-color: #fbfaf7 !important; }
-        .bg-gray-50 { background-color: #f3f0e8 !important; }
-        .border-gray-200, .border-gray-300 { border-color: #e6e2da !important; }
+       /* 🌿 스크롤 캡처가 가장 완벽하게 나오는 순백색 캡처 테마 */
+        body { background-color: #ffffff !important; color: #191919; }
         
-        /* 버튼 및 포인트 컬러: 클로드 특유의 차분한 카멜 브라운 & 챠콜 톤 */
-        .bg-blue-600, .bg-indigo-600 { background-color: #cc7a5c !important; } /* 포인트 브라운 */
+        /* 모든 카드와 레이아웃 배경을 완전한 흰색으로 변경 */
+        .bg-white, .bg-gray-100 { background-color: #ffffff !important; }
+        .bg-gray-50, .bg-indigo-50 { background-color: #ffffff !important; }
+        
+        /* 상단 프로필 영역: 테두리를 아주 연한 회색으로 정돈 */
+        .mb-6.p-4.bg-gray-50 {
+            background-color: #ffffff !important;
+            border: 1px solid #e5e7eb !important;
+        }
+        
+        /* 💡 [요청 반영] R-R-W-D-E-P 표: 왼쪽 식별자 칸에만 예쁜 웜톤 음영 남기기 */
+        .divide-y > div { border-bottom: 1px solid #e5e7eb !important; }
+        .w-20.bg-gray-50 {
+            background-color: #f3f0e8 !important; /* 왼쪽 칸만 차분한 웜그레이 베이지 */
+            border-right: 1px solid #e5e7eb !important;
+            color: #cc7a5c !important; /* 글자색은 시그니처 카멜 브라운 */
+        }
+        
+        /* 버튼 및 포인트 컬러: 기존 카멜 브라운 유지 */
+        .bg-blue-600, .bg-indigo-600 { background-color: #cc7a5c !important; }
         .bg-blue-600:hover, .bg-indigo-600:hover { background-color: #b36449 !important; }
-        .bg-gray-600, .bg-gray-800 { background-color: #383735 !important; } /* 챠콜 브라운 */
-        .bg-gray-600:hover, .bg-gray-800:hover { background-color: #2c2b29 !important; }
-        .text-indigo-600 { color: #cc7a5c !important; }
-        .bg-indigo-50 { background-color: #f3f0e8 !important; }
-        .bg-indigo-100 { background-color: #e6e2da !important; }
-
-        .chart-container { position: relative; width: 100%; max-width: 800px; }
+        .bg-gray-600, .bg-gray-800 { background-color: #383735 !important; }
         
-        /* 텍스트 박스: 평상시에는 얇고 투명한 회색 실선으로 깔끔하게 처리 */
+        .chart-container { position: relative; width: 100%; max-width: 800px; }
         .text-box {
-            position: absolute; background: rgba(255, 255, 255, 0.85);
+            position: absolute; background: rgba(255, 255, 255, 0.95);
             border: 1px solid #d1d5db; font-size: 8.5pt; overflow: hidden;
             cursor: move; min-width: 60px; min-height: 35px; z-index: 10;
             box-sizing: border-box; padding: 4px;
-            transition: border-color 0.15s, border-width 0.15s;
         }
-        /* 테두리 정렬(선택/크기 조절) 시에는 파란색 실선으로 변경 */
-        .text-box.resize-edge { 
-            cursor: se-resize; 
-            border: 2px solid #3b82f6; 
-        }
+        .text-box.resize-edge { cursor: se-resize; border: 2px solid #3b82f6; }
         [x-cloak] { display: none !important; }
 
     </style>
