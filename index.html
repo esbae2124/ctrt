@@ -11,6 +11,17 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
+    <!-- 모바일 홈 화면 추가 시 앱 아이콘 설정 -->
+    <link rel="apple-touch-icon" href="bluechart.jpg">
+    <link rel="icon" type="image/jpeg" sizes="192x192" href="bluechart.jpg">
+    <link rel="icon" type="image/jpeg" sizes="512x512" href="bluechart.jpg">
+    
+    <!-- 안드로이드/아이폰 상단 바 색상을 차분한 테마에 맞추기 -->
+    <meta name="theme-color" content="#fbfaf7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
     <title>현실치료 사례개념화 노트</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -48,6 +59,30 @@
             border: 2px solid #3b82f6; 
         }
         [x-cloak] { display: none !important; }
+
+        /* 🖨️ 인쇄(프린트)할 때만 작동하는 마법의 코드 */
+        @media print {
+            /* 1. 배경색을 강제로 완전한 흰색 바탕, 검은 글씨로 고정 */
+            body, .bg-white, .bg-gray-100, .bg-gray-50, .bg-indigo-50 {
+                background-color: #ffffff !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            /* 2. 인쇄할 때 굳이 종이에 나올 필요 없는 상단 버튼, 동기화 버튼, 모달 창 등을 숨김 */
+            header, button, .bg-indigo-55, a, [x-show="!isLoggedIn"] {
+                display: none !important;
+            }
+            /* 3. 내담자 프로필 섹션의 테두리를 인쇄에 최적화된 얇은 선으로 변경 */
+            .mb-6.p-4.bg-gray-50 {
+                background-color: #ffffff !important;
+                border: 1px solid #000000 !important;
+                padding: 10px !important;
+            }
+            /* 4. 화면 크기에 구애받지 않고 종이 가로폭에 꽉 차게 인쇄 */
+            .max-w-7xl { max-width: 100% !important; width: 100% !important; p: 0 !important; }
+            .grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
