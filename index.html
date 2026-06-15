@@ -115,28 +115,37 @@
         </div>
     </div>
 
-<div x-show="status.show" 
+<!-- 🌿 전체 테마와 어우러지는 단정하고 가독성 높은 웜톤 알림창 -->
+    <div x-show="status.show" 
          x-transition:enter="transition ease-out duration-300"
          x-transition:enter-start="opacity-0 transform -translate-y-2"
          x-transition:enter-end="opacity-100 transform translate-y-0"
          x-transition:leave="transition ease-in duration-200"
          x-transition:leave-start="opacity-100 transform translate-y-0"
          x-transition:leave-end="opacity-0 transform -translate-y-2"
-         class="status-toast fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-md shadow-xl font-bold text-sm flex items-center gap-3 border"
-         :class="status.type === 'loading' ? 'bg-amber-500 border-amber-600 text-white' : 'bg-gray-800 border-gray-900 text-white'"
+         class="status-toast fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-2.5 rounded-md shadow-md text-sm flex items-center gap-2 border"
+         :style="status.type === 'loading' 
+                 ? 'background-color: #f3f0e8 !important; border-color: #e6e2da !important; color: #cc7a5c !important;' 
+                 : 'background-color: #cc7a5c !important; border-color: #b36449 !important; color: #ffffff !important;'"
          x-cloak>
+        
+        <!-- 로딩 중일 때: 부드러운 카멜 브라운 색상의 회전 휠 -->
         <template x-if="status.type === 'loading'">
-            <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <svg class="animate-spin h-4 w-4" style="color: #cc7a5c;" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
         </template>
+        
+        <!-- 완료되었을 때: 단정한 별 이모지 -->
         <template x-if="status.type === 'success'">
-            <span>✨</span>
+            <span style="color: #ffffff;">✨</span>
         </template>
-        <span x-text="status.message" class="tracking-wide"></span>
+        
+        <!-- 메시지 텍스트 -->
+        <span x-text="status.message" class="font-bold tracking-wide"></span>
     </div>
-
+    
     <div x-show="isLoggedIn" class="max-w-7xl mx-auto" x-cloak>
         <header class="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b gap-4">
             <h1 class="text-2xl font-bold text-gray-800">🌿 현실치료 사례개념화 노트</h1>
