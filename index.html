@@ -57,61 +57,6 @@
         }
         [x-cloak] { display: none !important; }
 
-       /* 🖨️ [인쇄 전면 수정] 배경 몽땅 흰색 + 화면 그대로 캡처하듯 인쇄하는 코드 */
-        @media print {
-            /* 1. 몽땅 순백색 배경 전환 및 기본 텍스트 검은색 고정 */
-            body, html, .max-w-7xl, .bg-white, .bg-gray-100, .bg-indigo-50 {
-                background-color: #ffffff !important;
-                background: #ffffff !important;
-                color: #000000 !important;
-            }
-            
-            /* 2. 상단 프로필 상자 - 배경은 희게 빼고 얇은 회색 테두리만 남김 */
-            .mb-6.p-4.bg-gray-50 {
-                background-color: #ffffff !important;
-                border: 1px solid #d1d5db !important;
-                border-radius: 6px !important;
-                padding: 12px !important;
-            }
-
-            /* 3. 💡 [요청 반영] R-R-W-D-E-P 표 - 구분을 위해 왼쪽 알파벳 칸에만 은은한 회색 음영 주입 */
-            .divide-y > div {
-                border-bottom: 1px solid #e5e7eb !important;
-            }
-            .w-20.bg-gray-50 {
-                background-color: #f3f4f6 !important; /* 표 왼쪽 항목 칸에만 깔끔한 회색 음영 */
-                border-right: 1px solid #e5e7eb !important;
-            }
-
-            /* 4. 🔥 [핵심] 화면 레이아웃 깨짐 방지: 모니터 화면 비율(2분할) 그대로 강제 보존 */
-            .grid { 
-                display: flex !important; 
-                flex-direction: row !important; /* 아랫줄로 떨어지지 않고 나란히 배치 */
-                gap: 20px !important; 
-                width: 100% !important;
-            }
-            .grid > div {
-                flex: 1 !important; /* 좌측 차트와 우측 표가 정확히 반반씩 너비 차지 */
-                width: 50% !important;
-            }
-
-            /* 5. 블루차트 내부 텍스트 박스 위치 자석 고정 */
-            .chart-container {
-                position: relative !important;
-                width: 100% !important;
-            }
-            .text-box {
-                border: 1px solid #000000 !important;
-                background: rgba(255, 255, 255, 0.95) !important;
-                position: absolute !important; /* 위치 이탈 차단 */
-            }
-
-            /* 6. 인쇄 불필요 요소 원천 차단 */
-            header, button, .bg-indigo-55, a, [x-show="!isLoggedIn"], .status-toast, template {
-                display: none !important;
-            }
-        }
-
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
