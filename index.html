@@ -3,27 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <!-- 📍 여기에 복사한 og 코드를 그대로 붙여넣으세요! -->
+    
     <meta property="og:type" content="website">
     <meta property="og:title" content="현실치료 사례개념화 노트">
     <meta property="og:description" content="글라서(William Glasser) 모델 기반 블루차트 및 R-R-W-D-E-P 상담 기록 시스템">
-    
-    <meta property="og:image" content="blue-chart.jpg">
-    
+    <meta property="og:image" content="bluechart.jpg">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    
+
     <title>현실치료 사례개념화 노트</title>
     <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <style>
         .chart-container { position: relative; width: 100%; max-width: 800px; }
+        /* 텍스트 박스: 기본 크기 조절은 브라우저 내장 resize 대신 마우스 드래그 이벤트를 바인딩하므로 border 영역 스타일을 명확히 함 */
         .text-box {
             position: absolute; background: rgba(255, 255, 255, 0.85);
-            border: 1px solid #4b5563; font-size: 9.5pt; resize: both; overflow: auto;
-            cursor: move; min-width: 90px; min-height: 45px; z-index: 10;
+            border: 2px dashed #4b5563; font-size: 8.5pt; overflow: hidden;
+            cursor: move; min-width: 60px; min-height: 35px; z-index: 10;
+            box-sizing: border-box; padding: 4px;
         }
+        /* 테두리 영역에 마우스가 올라가면 크기 조절 커서 표시 */
+        .text-box.resize-edge { cursor: se-resize; border-style: solid; border-color: #3b82f6; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-4 md:p-6" x-data="app()" x-init="initApp()">
@@ -109,7 +110,7 @@
                 <div class="mt-4">
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-xs font-semibold text-gray-500">임상 자료 및 심리검사지 파일 링크 (구글 드라이브 등)</label>
-                        <button @click="addFileLink" class="text-xs bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold px-2 py-1 rounded border border-indigo-200 transition">
+                        <button @click="addFileLink" class="text-xs bg-indigo-55 text-indigo-600 hover:bg-indigo-100 font-bold px-2 py-1 rounded border border-indigo-200 transition">
                             ➕ 파일 링크 추가
                         </button>
                     </div>
@@ -131,7 +132,7 @@
                             </div>
                         </template>
                         <template x-if="!currentCase.client_info.file_links || currentCase.client_info.file_links.length === 0">
-                            <p class="text-xs text-gray-400 italic text-center py-2 bg-white rounded border border-dashed">등록된 첨부 파일 링크가 없습니다.오른쪽 상단 버튼으로 추가하세요.</p>
+                            <p class="text-xs text-gray-400 italic text-center py-2 bg-white rounded border border-dashed">등록된 첨부 파일 링크가 없습니다. 오른쪽 상단 버튼으로 추가하세요.</p>
                         </template>
                     </div>
                 </div>
@@ -145,16 +146,16 @@
                         <button @click="addTextBox" class="bg-yellow-500 text-white text-xs px-3 py-1.5 rounded-md shadow hover:bg-yellow-600">+ 텍스트 박스 추가</button>
                     </div>
                     <div class="chart-container border rounded-lg bg-gray-50 p-1 overflow-hidden shadow-inner" id="chartArea">
-    
-    <img src="bluechart.jpg" alt="Blue Chart" alt="Blue Chart" class="w-full opacity-95 select-none">
-    
-    <!-- 동적 텍스트 박스 배치 -->
-    <template x-for="box in currentCase.boxes" :key="box.id">
-                            <div class="text-box rounded shadow-md p-1.5"
+                        <img src="bluechart.jpg" alt="Blue Chart" class="w-full opacity-95 select-none">
+                        
+                        <template x-for="box in currentCase.boxes" :key="box.id">
+                            <div class="text-box rounded shadow-md"
+                                 :class="box.isEdge ? 'resize-edge' : ''"
                                  :style="`left: ${box.x}px; top: ${box.y}px; width: ${box.w}px; height: ${box.h}px;`"
-                                 @mousedown="dragStart($event, box)"
-                                 @click="openBoxModal(box)">
-                                <div class="w-full h-full overflow-hidden break-all leading-tight text-gray-800" x-html="box.text.replace(/\n/g, '<br>') || '<span class=\'text-gray-400\'>편집...</span>'"></div>
+                                 @mousemove="checkEdge($event, box)"
+                                 @mousedown="boxInteractStart($event, box)"
+                                 @dblclick="openBoxModal(box)">
+                                <div class="w-full h-full overflow-hidden break-all leading-tight text-gray-800" x-html="box.text.replace(/\n/g, '<br>') || '<span class=\'text-gray-400\'>더블클릭 편집</span>'"></div>
                             </div>
                         </template>
                     </div>
@@ -198,7 +199,7 @@
 
     <script>
         // ⚠️ 여기에 구글 웹 앱 새 배포 성공 후 생성된 최종 URL 주소를 붙여넣으세요!
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyFCssMTQ9A0LsTlB--GsCdZdyg_18LGiMrQlGuiW_FfL0fzXFVTfD2479Wzgptu7kO6w/exec"; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/.../exec"; 
 
         function app() {
             return {
@@ -232,16 +233,18 @@
                             body: JSON.stringify({ action: 'fetch' })
                         });
                         let data = await response.json();
-                        // 로드한 각 사례의 하위 호환성 보장 처리
                         this.caseList = data.map(item => {
                             if (!item.client_info) {
                                 item.client_info = { description: '', test_results: '', file_links: [] };
                             } else if (typeof item.client_info.file_url !== 'undefined' && !item.client_info.file_links) {
-                                // 기존의 단일 링크(file_url) 정보가 시트에 있었다면 리스트 형태로 자동 변환해 줌
                                 item.client_info.file_links = item.client_info.file_url ? [{ name: '기본 파일', url: item.client_info.file_url }] : [];
                                 delete item.client_info.file_url;
                             }
                             if(!item.client_info.file_links) item.client_info.file_links = [];
+                            // 구버전 호환성을 위한 패치 (동적 edge 플래그 보장)
+                            if(item.boxes) {
+                                item.boxes = item.boxes.map(b => ({ ...b, isEdge: false }));
+                            }
                             return item;
                         });
                     } catch (e) { console.error("데이터 로드 실패:", e); }
@@ -282,23 +285,58 @@
                 },
                 addTextBox() {
                     if(!this.currentCase) return;
-                    this.currentCase.boxes.push({ id: Date.now(), text: '새 메모', x: 40, y: 60, w: 120, h: 50 });
+                    this.currentCase.boxes.push({ id: Date.now(), text: '새 메모', x: 40, y: 60, w: 120, h: 50, isEdge: false });
                 },
-                dragStart(e, box) {
+                
+                // 마우스 위치가 우측/하단 테두리 10px 이내인지 판별하는 함수
+                checkEdge(e, box) {
+                    let rect = e.currentTarget.getBoundingClientRect();
+                    let mouseX = e.clientX - rect.left;
+                    let mouseY = e.clientY - rect.top;
+                    
+                    // 우측 혹은 하단 경계선 근처에 마우스가 있으면 테두리 상태로 판단
+                    box.isEdge = (rect.width - mouseX < 12 || rect.height - mouseY < 12);
+                },
+
+                // 한 번 클릭 후 이동 및 테두리 조절을 통합 제어하는 함수
+                boxInteractStart(e, box) {
+                    e.preventDefault();
                     let container = document.getElementById('chartArea').getBoundingClientRect();
+                    let startX = e.clientX;
+                    let startY = e.clientY;
+                    let initialX = box.x;
+                    let initialY = box.y;
+                    let initialW = box.w;
+                    let initialH = box.h;
+                    
+                    let isResizeMode = box.isEdge;
+
                     let moveHandler = (moveEvent) => {
-                        box.x = Math.max(0, Math.min(moveEvent.clientX - container.left - (box.w / 2), container.width - box.w));
-                        box.y = Math.max(0, Math.min(moveEvent.clientY - container.top - (box.h / 2), container.height - box.h));
+                        let deltaX = moveEvent.clientX - startX;
+                        let deltaY = moveEvent.clientY - startY;
+
+                        if (isResizeMode) {
+                            // 크기 조절 모드
+                            box.w = Math.max(60, initialW + deltaX);
+                            box.h = Math.max(35, initialH + deltaY);
+                        } else {
+                            // 단순 이동 모드
+                            box.x = Math.max(0, Math.min(initialX + deltaX, container.width - box.w));
+                            box.y = Math.max(0, Math.min(initialY + deltaY, container.height - box.h));
+                        }
                     };
+
                     let upHandler = () => {
                         window.removeEventListener('mousemove', moveHandler);
                         window.removeEventListener('mouseup', upHandler);
                     };
+
                     window.addEventListener('mousemove', moveHandler);
                     window.addEventListener('mouseup', upHandler);
                 },
+
                 openBoxModal(box) {
-                    this.modal = { show: true, type: 'box', targetId: box.id, title: '📌 블루차트 메모 편집', value: box.text };
+                    this.modal = { show: true, type: 'box', targetId: box.id, title: '📌 블루차트 메모 편집 (더블클릭)', value: box.text };
                 },
                 openTableModal(row) {
                     const names = { R1: "R: 상담자-내담자 관계 탐색", R2: "R: 내담자 주변인물 관계 탐색", W: "W: 바람(Want) 탐색", D: "D: 행동/지향(Doing) 탐색", E: "E: 내적 평가(Evaluation)", P: "P: 계획(Plan) 수립" };
