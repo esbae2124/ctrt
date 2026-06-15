@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현실치료 사례개념화 노트</title>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        .chart-container { position: relative; width: 100%; max-width: 800px; }
+        .text-box {
+            position: absolute; background: rgba(255, 255, 255, 0.85);
+            border: 1px solid #4b5563; font-size: 9.5pt; resize: both; overflow: auto;
+            cursor: move; min-width: 80px; min-height: 40px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-6" x-data="app()">
+
+    <div x-show="!isLoggedIn" class="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-96">
+            <h2 class="text-xl font-bold mb-4 text-center">관리자 인증</h2>
+            <input type="password" x-model="password" @keyup.enter="login" class="w-full p-2 border rounded mb-4" placeholder="비밀번호 입력">
+            <button @click="login" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">로그인</button>
+        </div>
+    </div>
+
+    <div x-show="isLoggedIn" class="max-w-7xl mx-auto">
+        <header class="flex justify-between items-center mb-6 pb-4 border-b">
+            <h1 class="text-2xl font-bold text-gray-800">현실치료 사례개념화 시스템</h1>
+            <div class="space-x-2">
+                <button @click="showList = !showList" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700">📋 조회/목록</button>
+                <button @click="createNewCase" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">➕ 새 사례 추가</button>
+            </div>
+        </header>
+
+        <div x-show="showList" class="bg-white p-6 rounded-lg shadow mb-6">
+            <h3 class="text-lg font-bold mb-3">사례 및 상황 목록</h3>
+            <table class="w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-200 text-left">
+                        <th class="p-2 border">사례명 (내담자)</th>
+                        <th class="p-2 border">상황명</th>
+                        <th class="p-2 border">생성일</th>
+                        <th class="p-2 border">수정일</th>
+                        <th class="p-2 border">관리</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="item in caseList">
+                        <tr class="hover:bg-gray-50 cursor-pointer" @click="selectCase(item)">
+                            <td class="p-2 border font-semibold" x-text="item.client_name"></td>
+                            <td class="p-2 border text-blue-600" x-text="item.situation_name || '기본 상황'"></td>
+                            <td class="p-2 border text-sm text-gray-500" x-text="item.created_at"></td>
+                            <td class="p-2 border text-sm text-gray-500" x-text="item.updated_at"></td>
+                            <td class="p-2 border">
+                                <button @click.stop="addSituation(item.client_name)" class="bg-green-500 text-white text-xs px-2 py-1 rounded">상황 추가</button>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <div x-show="currentCase" class="bg-white p-6 rounded-lg shadow-lg">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <input type="text" x-model="currentCase.client_name" class="text-2xl font-bold border-b border-gray-400 focus:outline-none" placeholder="사례명(내담자 이름)">
+                    <input type="text" x-model="currentCase.situation_name" class="text-lg ml-4 border-b border-gray-300 text-gray-600 focus:outline-none" placeholder="상황명 입력">
+                </div>
+                <button @click="saveData" class="bg-indigo-600 text-white px-6 py-2 rounded shadow hover:bg-indigo-700">💾 현재 상황 저장 (Ctrl+Enter)</button>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <div>
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-bold text-gray-700">📊 블루차트 (Total Behavior)</span>
+                        <button @click="addTextBox" class="bg-sm bg-yellow-500 text-white text-xs px-3 py-1 rounded shadow">+ 텍스트 박스 추가</button>
+                    </div>
+                    <div class="chart-container border rounded bg-gray-50 p-2 overflow-hidden" id="chartArea">
+                        <img src="1781558647461.jpg" alt="Blue Chart" class="w-full opacity-90 select-none">
+                        
+                        <template x-for="box in currentCase.boxes" :key="box.id">
+                            <div class="text-box rounded p-1 shadow-md"
+                                 :style="`left: ${box.x}px; top: ${box.y}px; width: ${box.w}px; height: ${box.h}px;`"
+                                 @mousedown="dragStart($event, box)"
+                                 @click="openBoxModal(box)">
+                                <div class="w-full h-full overflow-hidden break-all leading-tight text-gray-800" x-html="box.text.replace(/\n/g, '<br>') || '<span class=\'text-gray-400\'>클릭하여 입력</span>'"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="font-bold text-gray-700 block mb-2">📋 R-R-W-D-E-P 진행 기록</span>
+                    <div class="border rounded overflow-hidden shadow-sm">
+                        <template x-for="row in ['R1', 'R2', 'W', 'D', 'E', 'P']">
+                            <div class="flex border-b last:border-b-0 bg-white hover:bg-gray-50 cursor-pointer" @click="openTableModal(row)">
+                                <div class="w-20 bg-gray-100 font-bold flex items-center justify-center p-4 border-r text-lg text-gray-700" x-text="row"></div>
+                                <div class="flex-1 p-4 text-sm text-gray-600 min-h-[4rem] flex items-center whitespace-pre-line" x-text="currentCase.table[row] || '터치하여 내용을 입력하세요 (최대 1~2문장 권장)'"></div>
+                            </div>
+                        </template>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div x-show="modal.show" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-lg">
+            <h3 class="text-lg font-bold mb-3 text-gray-800" x-text="modal.title"></h3>
+            <textarea x-model="modal.value" class="w-full h-40 p-3 border rounded focus:ring-2 focus:ring-indigo-500 mb-4" placeholder="내용을 입력하세요. (줄바꿈: Enter / 저장: Ctrl+Enter)"></textarea>
+            <div class="flex justify-between items-center">
+                <template x-if="modal.type === 'box'">
+                    <button @click="deleteBox" class="bg-red-500 text-white px-3 py-1.5 rounded text-sm">삭제</button>
+                </template>
+                <div class="flex space-x-2 ml-auto">
+                    <button @click="modal.show = false" class="bg-gray-300 text-gray-700 px-4 py-1.5 rounded">취소</button>
+                    <button @click="saveModalValue" class="bg-indigo-600 text-white px-4 py-1.5 rounded flex items-center">
+                        🚀 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function app() {
+            return {
+                isLoggedIn: false, password: '', showList: false,
+                caseList: [], // 구글 시트 연동 후 채워질 데이터 배열
+                currentCase: null,
+                modal: { show: false, type: '', targetId: '', title: '', value: '' },
+                
+                login() {
+                    if(this.password === "1234") { // 실제 운영시 원하는 비밀번호로 변경
+                        this.isLoggedIn = true;
+                        this.loadDummyData(); // 초기 가더미 로드
+                    } else { alert("비밀번호가 틀렸습니다."); }
+                },
+                loadDummyData() {
+                    this.caseList = [
+                        { id: 1, client_name: "홍길동", situation_name: "직장 내 갈등", created_at: "2026-06-01", updated_at: "2026-06-15", table: {W: "상사에게 인정받고 싶다."}, boxes: [{id:1, text:"생리/욕구 표출", x:50, y:80, w:120, h:50}] }
+                    ];
+                },
+                createNewCase() {
+                    this.currentCase = {
+                        id: Date.now(), client_name: '', situation_name: '',
+                        created_at: new Date().toLocaleDateString(), updated_at: new Date().toLocaleDateString(),
+                        table: { R1:'', R2:'', W:'', D:'', E:'', P:'' }, boxes: []
+                    };
+                    this.showList = false;
+                },
+                addSituation(clientName) {
+                    this.currentCase = {
+                        id: Date.now(), client_name: clientName, situation_name: '',
+                        created_at: new Date().toLocaleDateString(), updated_at: new Date().toLocaleDateString(),
+                        table: { R1:'', R2:'', W:'', D:'', E:'', P:'' }, boxes: []
+                    };
+                    this.showList = false;
+                },
+                selectCase(item) {
+                    this.currentCase = JSON.parse(JSON.stringify(item));
+                    this.showList = false;
+                },
+                // 블루차트 텍스트 박스 기능들
+                addTextBox() {
+                    this.currentCase.boxes.push({
+                        id: Date.now(), text: '새 메모', x: 20, y: 50, w: 130, h: 60
+                    });
+                },
+                dragStart(e, box) {
+                    let container = document.getElementById('chartArea').getBoundingClientRect();
+                    let moveHandler = (moveEvent) => {
+                        box.x = moveEvent.clientX - container.left - (box.w / 2);
+                        box.y = moveEvent.clientY - container.top - (box.h / 2);
+                    };
+                    let upHandler = () => {
+                        window.removeEventListener('mousemove', moveHandler);
+                        window.removeEventListener('mouseup', upHandler);
+                    };
+                    window.addEventListener('mousemove', moveHandler);
+                    window.addEventListener('mouseup', upHandler);
+                },
+                openBoxModal(box) {
+                    this.modal = { show: true, type: 'box', targetId: box.id, title: '블루차트 메모 편집', value: box.text };
+                },
+                openTableModal(rowName) {
+                    const titles = { R1:"R: 상담자와 내담자의 관계탐색", R2:"R: 내담자의 주변인 관계탐색", W:"W: 바람(Want) 탐색", D:"D: 행동(Doing) 탐색", E:"E: 평가(Evaluation)", P:"P: 계획(Plan)" };
+                    this.modal = { show: true, type: 'table', targetId: rowName, title: titles[rowName], value: this.currentCase.table[rowName] || '' };
+                },
+                saveModalValue() {
+                    if (this.modal.type === 'box') {
+                        let box = this.currentCase.boxes.find(b => b.id === this.modal.targetId);
+                        if (box) box.text = this.modal.value;
+                    } else if (this.modal.type === 'table') {
+                        this.currentCase.table[this.modal.targetId] = this.modal.value;
+                    }
+                    this.modal.show = false;
+                },
+                deleteBox() {
+                    this.currentCase.boxes = this.currentCase.boxes.filter(b => b.id !== this.modal.targetId);
+                    this.modal.show = false;
+                },
+                saveData() {
+                    this.currentCase.updated_at = new Date().toLocaleDateString();
+                    // 여기에 실제 Google Apps Script API를 호출하는 fetch() 함수 추가 영역
+                    alert(`${this.currentCase.client_name} - ${this.currentCase.situation_name || '기본'} 저장 완료!`);
+                }
+            }
+        }
+        // 글로벌 단축키 처리 (Ctrl + Enter 저장)
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                const appEl = document.querySelector('[x-data]');
+                if(appEl) Alpine.store('dummy') || appEl.__x.$data.saveData();
+            }
+        });
+    </script>
+</body>
+</html>
